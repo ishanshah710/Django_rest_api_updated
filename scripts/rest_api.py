@@ -5,40 +5,126 @@ import os
 
 # AUTH_ENDPOINT = "http://127.0.0.1:8000/api/auth/jwt/"
 
-AUTH_ENDPOINT = "http://127.0.0.1:8000/api/auth/register/"
+BASE_ENDPOINT = "http://127.0.0.1:8000/api/status/"
+
+
+AUTH_ENDPOINT = "http://127.0.0.1:8000/api/auth/"
 REFRESH_ENDPOINT = AUTH_ENDPOINT + "jwt/refresh/"
-ENDPOINT = "http://127.0.0.1:8000/api/status/"
 
 image_path = os.path.join(os.getcwd() , "iitb.jpeg")
 
 
 data = {
-#     # "username" : "ishan",
-#     "username" : "ishan@gmail.com",
-#
-#     "password" : "codechef",
-#     "password2" : "codechef"
-
-
-    # To create new user
-
-    "username" : "iitb",
-    "email" : "iitb@gmail.com",
-    "password" : "codechef",
-    "password2" : "codechef"
+    "username" : "ishan" ,
+    "password" : "codechef"
 }
+
 
 headers = {
     "content-Type" : "application/json" ,
-    # "Authorization" : "JWT " + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImlzaGFuIiwiZXhwIjoxNTYwOTY5NjU2LCJlbWFpbCI6InNoYWhpc2hhbjcxMDk4QGdtYWlsLmNvbSIsIm9yaWdfaWF0IjoxNTYwOTY5MzU2fQ.dA3Wcc6bqTMqMEcuUiXsVqgP39_ziUqVlOdNsrSAIEg'
+    # "Authorization" : "JWT " + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNCwidXNlcm5hbWUiOiJpc2hhbjExIiwiZXhwIjoxNTYxNjI0NjIzLCJlbWFpbCI6ImlzaDExQGdtYWlsLmNvbSIsIm9yaWdfaWF0IjoxNTYxNjI0MzIzfQ.7Ei2-2cOo1BfSNfSAHtiqf9sLY25lRKTOlmTDqcpwgM'
 }
 
 data = json.dumps(data)
 r = requests.post(AUTH_ENDPOINT, data=data , headers=headers)
 # print(r.json())
 
-token = r.json()#['token']
+token = r.json()['token']
 print(token)
+
+
+### To update existing elements ###
+
+ # 34 is pk of element to be updated
+ENDPOINT = BASE_ENDPOINT + "34/"
+
+headers2 = {
+    "Authorization" : "JWT " + token
+}
+
+data2 = {"content" : "updated 34!"}
+
+# r = requests.put(ENDPOINT , data=data2 , headers=headers2)
+# print(r.text)
+
+
+### To create new elements with above idea ###
+
+# headers2 and data2 are same as above
+
+# r =requests.post(BASE_ENDPOINT , data=data2 , headers=headers2)
+# print(r.text)
+
+
+# To update element with pk 26 after changed its User(owner) from django admin interface manually
+# Now its owner is 'ishan7' but we still have 'ishan' here in data dictionary #
+# and we want to update this element with pk 26 #
+
+# ENDPOINT = BASE_ENDPOINT + "26/"
+#
+# # r = requests.put(ENDPOINT , data=data2 , headers=headers2)
+# # print(r.text)
+#
+#
+# ### To delete element ###
+#
+# # we dont need data2 now
+#
+# # we want to delete element with pk 36
+# ENDPOINT = BASE_ENDPOINT + "36/"
+#
+# r = requests.delete(ENDPOINT , headers=headers2)
+# print(r.text) # It will not print anything bcoz it is deleted.
+
+
+# ### To retrieve all elements ###
+#
+# r = requests.get(BASE_ENDPOINT , headers=headers2)
+# print(r.json())  # It will also print that element with pk 26 which has different owner('ishan7') (user:11)
+
+### To retrieve element with different owner (pk 26 )
+
+ENDPOINT = BASE_ENDPOINT + "26/"
+
+r = requests.get(ENDPOINT , headers=headers2)
+print(r.text)
+
+
+
+
+
+
+
+# AUTH_ENDPOINT = "http://127.0.0.1:8000/api/auth/register/"
+# REFRESH_ENDPOINT = AUTH_ENDPOINT + "jwt/refresh/"
+# ENDPOINT = "http://127.0.0.1:8000/api/status/"
+#
+# image_path = os.path.join(os.getcwd() , "iitb.jpeg")
+#
+#
+# data = {
+#     "username" : "ishan12" ,
+#     "email" : "ish12@gmail.com" ,
+#     "password" : "codechef" ,
+#     "password2" : "codechef"
+# }
+#
+#
+# headers = {
+#     "content-Type" : "application/json" ,
+#     "Authorization" : "JWT " + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNCwidXNlcm5hbWUiOiJpc2hhbjExIiwiZXhwIjoxNTYxNjI0NjIzLCJlbWFpbCI6ImlzaDExQGdtYWlsLmNvbSIsIm9yaWdfaWF0IjoxNTYxNjI0MzIzfQ.7Ei2-2cOo1BfSNfSAHtiqf9sLY25lRKTOlmTDqcpwgM'
+# }
+#
+# data = json.dumps(data)
+# r = requests.post(AUTH_ENDPOINT, data=data , headers=headers)
+# # print(r.json())
+#
+# token = r.json()#['token']
+# print(token)
+
+
+
+
 # print(token)
 # print(token)
 

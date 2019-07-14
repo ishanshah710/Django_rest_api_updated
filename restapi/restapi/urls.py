@@ -25,4 +25,7 @@ urlpatterns = [
     path('api/status/',include('status.api.urls')), # api/status
 
     path('api/auth/',include('accounts.api.urls')),
+    path('api/user/',include('accounts.api.urls_users',)),
+
+# namespace='api-user'
 ]

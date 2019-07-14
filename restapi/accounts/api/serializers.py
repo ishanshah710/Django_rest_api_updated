@@ -15,12 +15,39 @@ expire_delta = settings.JWT_AUTH['JWT_REFRESH_EXPIRATION_DELTA']
 
 User = get_user_model()
 
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    uri = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['pk','username','uri']
+
+
+
+class UserPublicSerializer(serializers.ModelSerializer):
+    uri = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['pk' , 'username','uri']
+
+    def get_uri(self , obj):
+        return "/api/users/{pk}/".format(pk=obj.pk)
+
+
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     # password = serializers.CharField(style={'input_type':'password'} , write_only=True)
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+
     token = serializers.SerializerMethodField(read_only=True)
+
     expires = serializers.SerializerMethodField(read_only=True)
-    token_response = serializers.SerializerMethodField(read_only=True)
+
+    # token_response = serializers.SerializerMethodField(read_only=True)
+    message = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -32,14 +59,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             'token',
 
             'expires',
-            'token_response' # defined by get_token_response
+            # 'token_response' # defined by get_token_response
+
+            'message' # get_message
         ]
         extra_kwargs = {'password' : {'write_only' : True}}
 
 # If we comment out password = ... and extra_kwargs = ... both and then assign a new user to #
 # data dictionary in rest_api.py for creating new user then run rest_api.py #
 # Then in output it will show password also in hashed format #
-
 
 
     def validate_email(self,value):
@@ -66,11 +94,33 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     def get_expires(self,obj): # actually no need of obj
         return timezone.now() + expire_delta - datetime.timedelta(seconds=200)
 
-    def get_token_response(self , obj):
-        user = obj
-        payload = jwt_payload_handler(user)
-        token = jwt_encode_handler(payload)
-        response = jwt_response_payload_handler(token , user , request = None) # request = request
+
+    # def get_token_response(self , obj):
+    #     user = obj
+    #
+    #     ## Before creating extra context get_serializer_context in views
+    #
+    #     # payload = jwt_payload_handler(user)
+    #     # token = jwt_encode_handler(payload)
+    #     # response = jwt_response_payload_handler(token , user , request = None) # request = request
+    #
+    #     ## After creating extra context get_serializer_context in views
+    #
+    #     payload = jwt_payload_handler(user)
+    #     token = jwt_encode_handler(payload)
+    #     context = self.context
+    #
+    #     ## just for printing and checking ##
+    #     request = context['request']
+    #     print(request.user.is_authenticated)
+    #
+    #     response = jwt_response_payload_handler(token , user , request = context['request'])
+    #
+    #     return response
+
+
+    def get_message(self,obj):
+        return "Thank you for registering. Please verify your email before continuing."
 
     def validate(self, data):
         pwd = data.get('password')
@@ -96,5 +146,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
                         email = validated_data.get('email'))
 
         user_obj.set_password(validated_data.get('password'))
+        user_obj.is_active = False # to check active status of use in django-admin interface
         user_obj.save()
         return user_obj

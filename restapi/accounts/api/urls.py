@@ -9,4 +9,5 @@ urlpatterns = [
 
     path('jwt/',obtain_jwt_token),
     path('jwt/refresh/',refresh_jwt_token),
+
 ]

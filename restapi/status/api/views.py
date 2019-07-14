@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, mixins, permissions
 
+from accounts.api.permissions import IsOwnerOrReadOnly
 from status.api.serializers import StatusSerializer
 from status.models import Status
 from django.shortcuts import get_object_or_404
@@ -22,7 +23,12 @@ def is_json(json_data):
 class StatusAPIDetailView(mixins.UpdateModelMixin , mixins.DestroyModelMixin,
                           generics.RetrieveAPIView):
     # authentication_classes = []
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    # We have now applied permission IsOwnerOrReadOnly to thie View so it is saying that #
+    # If user isn't owner of particular item it will not allow to do methods defined inside #
+    # this view i.e (put , patch and delete ) #
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly , IsOwnerOrReadOnly]
     serializer_class = StatusSerializer
     queryset = Status.objects.all()
 
